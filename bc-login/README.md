@@ -9,12 +9,12 @@
 <!-- vim-markdown-toc -->
 # Working
   - puppet configuration for
-   - docker daemon
-   - docker-compose
-   - running docker-compose on service
-  - Automated service via docker compose
+    - docker daemon
+    - docker-compose
+    - running docker-compose on service
+    - automated service via docker compose
    - Populate Databases (initdb)
-   - Populate Database (service connectio incl. node connections)
+   - Populate Database (service connection incl. node connections)
   - getting access token via REST
 
 # Issues
@@ -23,7 +23,6 @@
 
 # ToDo
   - adding nginx proxy to compose file
-  - documenting workflow and dependencies (eg. ssh hmacs and digest
-      customization)
+  - documenting workflow and dependencies (eg. ssh hmacs and digest customization)
 
 
