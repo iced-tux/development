@@ -1,0 +1,62 @@
+version: '3.6'
+
+networks:
+    guacamole2guacd:
+    guacamole2db:
+
+volumes:
+    db_data:
+    guacd_drive:
+    guacd_record:
+
+services:
+    guacamole-db:
+        hostname: guacamole-db
+        image: mariadb
+        restart: on-failure
+        volumes:
+            - type: bind
+              source: ./db_init/
+              target: /docker-entrypoint-initdb.d/
+              read_only: true
+            - type: volume
+              source: db_data
+              target: '/var/lib/mysql'
+        networks:
+            guacamole2db:
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            TZ: 'Europe/Berlin'
+
+    guacd:
+        hostname: guacamole-guacd
+        image: guacamole/guacd:0.9.14
+        restart: on-failure
+        volumes:
+            - type: volume
+              source: guacd_drive
+              target: /drive
+            - type: volume
+              source: guacd_record
+              target: /record
+        networks:
+            guacamole2guacd:
+
+    guacamole:
+        hostname: guacamole
+        image: guacamole/guacamole:0.9.14
+        restart: on-failure
+        ports:
+            - 80:8080
+        networks:
+            guacamole2db:
+            guacamole2guacd:
+        environment:
+            GUACD_HOSTNAME: guacd
+            MYSQL_HOSTNAME: guacamole-db
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}

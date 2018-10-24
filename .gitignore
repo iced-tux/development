@@ -1,0 +1,8 @@
+# Cache objects
+packer_cache/
+*.swp
+*.key
+*.crt
+*.dhparam
+*.ova
+*.commented

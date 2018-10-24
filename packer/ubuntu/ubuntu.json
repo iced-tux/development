@@ -1,0 +1,57 @@
+{
+  "variables": {
+    "ssh_name": "cloud",
+    "ssh_pass": "cloud",
+    "hostname": "packer-test.cloud"
+  },
+  "builders": [{
+    "type": "virtualbox-iso",
+    "guest_os_type": "Ubuntu_64",
+    
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--memory", "2048", "--vram", "32", "--cpus", "2"]
+    ],
+
+    "export_opts": [
+      "--manifest",
+      "--vsys", "0",
+      "--description", "Eine Test VM",
+      "--version", "0.1"
+    ],
+    "format": "ova",
+    "headless": "true",
+    "disk_size": "5000",
+
+    "iso_url": "/home/christian/iso/ubuntu-18.04-server-netboot-amd64.iso",
+    "iso_checksum": "bed8a55ae2a657f8349fe3271097cff3a5b8c3d1048cf258568f1601976fa30d",
+    "iso_checksum_type": "sha256",
+
+    "http_directory": "http",
+    "http_port_min": "9001",
+    "http_port_max": "9001",
+
+    "ssh_username": "{{user `ssh_name`}}",
+    "ssh_password": "{{user `ssh_pass`}}",
+    "ssh_wait_timeout": "20m",
+    "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+
+    "boot_command": [
+      "<esc><esc><wait>",
+      "linux ",
+      "initrd=initrd.gz ",
+      "priority=low ",
+      "DEBIAN_FRONTEND=noninteractive ",
+      "auto ",
+      "locale=de_DE ",
+      "console-setup/ask_detect=false ",
+      "fb=false ",
+      "netcfg/get_hostname=packer-test ",
+      "netcfg/get_domain=cloud ",
+      "grub-installer/bootdev=/dev/sda ",
+      "noapic ",
+      "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+      "--- ",
+      "<enter><wait>"
+    ]
+  }]
+}
