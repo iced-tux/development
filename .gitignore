@@ -7,4 +7,4 @@ packer_cache/
 *.ova
 *.commented
 
-apps_custom/*
+apps_custom
