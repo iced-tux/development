@@ -1,6 +1,7 @@
 version: '3.6'
 
 networks:
+    rev2guacamole:
     guacamole2guacd:
     guacamole2db:
 
@@ -10,6 +11,20 @@ volumes:
     guacd_record:
 
 services:
+    guacamole-rev:
+        hostname: guacamole-rev
+        image: nginx:mainline-alpine
+        restart: on-failure
+        volumes:
+            - type: bind
+              source: ./nginx/
+              target: /etc/nginx/conf.d
+              read_only: true
+        networks:
+            rev2guacamole:
+        ports:
+            - 80:80
+
     guacamole-db:
         hostname: guacamole-db
         image: mariadb
@@ -49,9 +64,8 @@ services:
         hostname: guacamole
         image: guacamole/guacamole:0.9.14
         restart: on-failure
-        ports:
-            - 80:8080
         networks:
+            rev2guacamole:
             guacamole2db:
             guacamole2guacd:
         environment:
