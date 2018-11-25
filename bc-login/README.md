@@ -13,16 +13,19 @@
     - docker-compose
     - running docker-compose on service
     - automated service via docker compose
-   - Populate Databases (initdb)
-   - Populate Database (service connection incl. node connections)
-  - getting access token via REST
+   - Populate Databases
+    - Initialise DB (initdb)
+    - Change guacadmin pwd & force new password
+    - Initialise service struct
+    - Create User
+    - Create user specific connections
+    - Map user to connection groups/connections
+  - Nginx ReverseProxy
 
 # Issues
-  - adding user (password is a binary field with binary hash field)
   - exploring REST api aside from /api/tokens
 
+  - Hardend ssh config prevents guacamole ssh (HMAC and KEX are problematic)
+
 # ToDo
-  - adding nginx proxy to compose file
-  - documenting workflow and dependencies (eg. ssh hmacs and digest customization)
-
-
+  - Make puppet template files from sql statements
