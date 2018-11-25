@@ -6,3 +6,5 @@ packer_cache/
 *.dhparam
 *.ova
 *.commented
+
+apps_custom/*
