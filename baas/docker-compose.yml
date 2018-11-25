@@ -12,7 +12,7 @@ services:
       - net_db
 
   redis:
-    image: redis
+    image: redis:5-alpine
     restart: always
     networks:
       - net_redis
@@ -34,7 +34,7 @@ services:
       - net_db
       - net_redis
       - net_clamav
-      - net_minio
+      # - net_minio
 
   web:
     build: ./web
@@ -69,29 +69,29 @@ services:
     networks:
         - net_clamav
   
-  minio:
-    image: minio/minio
-    restart: always
-    volumes:
-        - minio01:/data01
-        - minio02:/data02
-        - minio03:/data03
-    env_file:
-        - minio.env
-    command: server "/data01, /data02, /data03"
-    # ports:
-    #   - 9000:9000
-    networks:
-        - net_minio
+  # minio:
+  #   image: minio/minio
+  #   restart: always
+  #   volumes:
+  #       - minio01:/data01
+  #       - minio02:/data02
+  #       - minio03:/data03
+  #   env_file:
+  #       - minio.env
+  #   command: server "/data01, /data02, /data03"
+  #   # ports:
+  #   #   - 9000:9000
+  #   networks:
+  #       - net_minio
 
 
 volumes:
   db:
   nextcloud_core:
   nextcloud_data:
-  minio01:
-  minio02:
-  minio03:
+  # minio01:
+  # minio02:
+  # minio03:
   # nextcloud_custom:
   # nextcloud_config:
 
@@ -100,4 +100,4 @@ networks:
   net_db:
   net_redis:
   net_clamav:
-  net_minio:
+  # net_minio:
