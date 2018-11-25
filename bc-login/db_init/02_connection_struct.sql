@@ -48,7 +48,7 @@ INSERT INTO guacamole_db.guacamole_connection_group VALUES\
 
 /* insert node inside service structure */
 INSERT INTO guacamole_db.guacamole_connection VALUES (1,'Level01_Connection01',\
-  1,'ssh',NULL,NULL,NULL,NULL,NULL,NULL,0);
+  2,'ssh',NULL,NULL,NULL,NULL,NULL,NULL,0);
 INSERT INTO guacamole_db.guacamole_connection VALUES (2,'Level01_1_Connection01'\
   ,3,'ssh',NULL,NULL,NULL,NULL,NULL,NULL,0);
 INSERT INTO guacamole_db.guacamole_connection VALUES (3,'Level01_1_Connection02'\
