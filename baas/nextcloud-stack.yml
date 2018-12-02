@@ -1,0 +1,80 @@
+# @Author: Christian Langer <christian>
+# @Date:   2018-10-28T15:09:07+01:00
+# @Filename:
+# @Last modified by:   christian
+# @Last modified time: 2018-12-01T18:16:41+01:00
+
+version: '3'
+
+volumes:
+  db:
+  nextcloud_core:
+  nextcloud_data:
+
+networks:
+  net_app:
+  net_db:
+  net_redis:
+  net_clamav:
+
+services:
+  web:
+    image: nginx:stable-alpine
+    restart: always
+    volumes:
+        - ./nginx_config:/etc/nginx/conf.d:ro
+    networks:
+      - net_app
+
+  app:
+    image: nextcloud:stable-fpm-alpine
+    restart: always
+    volumes:
+      - nextcloud_core:/var/www/html
+      - nextcloud_data:/var/www/html/data
+      - ./nextcloud_custom:/var/www/html/custom_apps
+      - ./nextcloud_config:/var/www/html/config
+    environment:
+      - MYSQL_HOST=db
+    env_file:
+      - db.env
+    networks:
+      - net_app
+      - net_db
+      - net_redis
+      - net_clamav
+
+  db:
+    image: mariadb:10.4
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+      - ./db_config:etc/mysql/conf.d:ro
+    environment:
+      - TZ: 'Europe/Berlin'
+    env_file:
+      - db.env
+    networks:
+      - net_db
+
+  redis:
+    image: redis:5-alpine
+    restart: always
+    networks:
+      - net_redis
+
+  cron:
+    image: nextcloud:stable-fpm-alpine
+    restart: always
+    volumes:
+        - nextcloud_core:/var/www/html:ro
+        - nextcloud_data:/var/www/html/data:ro
+        - ./nextcloud_custom:/var/www/html/custom_apps:ro
+        - ./nextcloud_config:/var/www/html/config:ro
+    entrypoint: /cron.sh
+
+  clamav:
+    image: dinkel/clamavd
+    restart: always
+    networks:
+        - net_clamav
