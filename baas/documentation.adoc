@@ -1,5 +1,5 @@
 :Author:    Christian Langer
-:Email:     christian.langer@itzbund.de
+:Email:     iced-tux
 :Date:      20181201
 :Revision:  0.1
 :page-layout: docs
