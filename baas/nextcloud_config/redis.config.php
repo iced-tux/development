@@ -1,8 +1,11 @@
 <?php
-$CONFIG = array (
-  'memcache.locking' => '\OC\Memcache\Redis',
-  'redis' => array(
-    'host' => 'redis',
-    'port' => 6379,
+$CONFIG = array(
+
+'memcache.distributed' => '\OC\Memcache\Redis',
+'memcache.locking' => '\OC\Memcache\Redis',
+'memcache.local' => '\OC\Memcache\APCu',
+'redis' => array(
+   'host' => 'redis',
+   'port' => 6379,
   ),
 );
