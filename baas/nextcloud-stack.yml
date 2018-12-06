@@ -2,7 +2,7 @@
 # @Date:   2018-10-28T15:09:07+01:00
 # @Filename:
 # @Last modified by:   christian
-# @Last modified time: 2018-12-01T18:16:41+01:00
+# @Last modified time: 2018-12-05T14:59:05+01:00
 
 version: '3'
 
@@ -23,6 +23,16 @@ services:
     restart: always
     volumes:
         - ./nginx_config:/etc/nginx/conf.d:ro
+        - ./nginx_ssl:/etc/nginx/ssl:ro
+        - nextcloud_core:/var/www/html:ro
+        - nextcloud_data:/var/www/html/data:ro
+        - ./nextcloud_custom:/var/www/html/custom_apps:ro
+        - ./nextcloud_config:/var/www/html/config:ro
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - "app"
     networks:
       - net_app
 
@@ -38,6 +48,8 @@ services:
       - MYSQL_HOST=db
     env_file:
       - db.env
+    depends_on:
+      - "db"
     networks:
       - net_app
       - net_db
@@ -49,9 +61,10 @@ services:
     restart: always
     volumes:
       - db:/var/lib/mysql
-      - ./db_config:etc/mysql/conf.d:ro
+      # - ./db_config:/etc/mysql/conf.d:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
-      - TZ: 'Europe/Berlin'
+      TZ: Europe/Berlin
     env_file:
       - db.env
     networks:
@@ -60,6 +73,8 @@ services:
   redis:
     image: redis:5-alpine
     restart: always
+    depends_on:
+      - "app"
     networks:
       - net_redis
 
@@ -70,8 +85,10 @@ services:
         - nextcloud_core:/var/www/html:ro
         - nextcloud_data:/var/www/html/data:ro
         - ./nextcloud_custom:/var/www/html/custom_apps:ro
-        - ./nextcloud_config:/var/www/html/config:ro
+        - ./nextcloud_config:/var/www/html/config
     entrypoint: /cron.sh
+    depends_on:
+      - "app"
 
   clamav:
     image: dinkel/clamavd
