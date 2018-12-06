@@ -7,6 +7,6 @@ packer_cache/
 dhparam.
 *.ova
 *.commented
-
+nginx_ssl/
 baas/app/apps_custom/*
 baas/nextcloud_custom/*
