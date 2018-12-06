@@ -8,3 +8,4 @@ packer_cache/
 *.commented
 
 baas/app/apps_custom/*
+baas/nextcloud_custom/*
