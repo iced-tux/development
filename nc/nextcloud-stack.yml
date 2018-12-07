@@ -1,0 +1,97 @@
+# @Author: Christian Langer <christian>
+# @Date:   2018-10-28T15:09:07+01:00
+# @Filename:
+# @Last modified by:   christian
+# @Last modified time: 2018-12-05T14:59:05+01:00
+
+version: '3'
+
+volumes:
+  db:
+  nextcloud_core:
+  nextcloud_data:
+
+networks:
+  net_app:
+  net_db:
+  net_redis:
+  net_clamav:
+
+services:
+  web:
+    image: nginx:stable-alpine
+    restart: always
+    volumes:
+        - ./nginx_config:/etc/nginx/conf.d:ro
+        - ./nginx_ssl:/etc/nginx/ssl:ro
+        - nextcloud_core:/var/www/html:ro
+        - nextcloud_data:/var/www/html/data:ro
+        - ./nextcloud_custom:/var/www/html/custom_apps:ro
+        - ./nextcloud_config:/var/www/html/config:ro
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - "app"
+    networks:
+      - net_app
+
+  app:
+    image: nextcloud:stable-fpm-alpine
+    restart: always
+    volumes:
+      - nextcloud_core:/var/www/html
+      - nextcloud_data:/var/www/html/data
+      - ./nextcloud_custom:/var/www/html/custom_apps
+      - ./nextcloud_config:/var/www/html/config
+    environment:
+      - MYSQL_HOST=db
+    env_file:
+      - db.env
+    depends_on:
+      - "db"
+    networks:
+      - net_app
+      - net_db
+      - net_redis
+      - net_clamav
+
+  db:
+    image: mariadb:10.4
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+      # - ./db_config:/etc/mysql/conf.d:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      TZ: Europe/Berlin
+    env_file:
+      - db.env
+    networks:
+      - net_db
+
+  redis:
+    image: redis:5-alpine
+    restart: always
+    depends_on:
+      - "app"
+    networks:
+      - net_redis
+
+  cron:
+    image: nextcloud:stable-fpm-alpine
+    restart: always
+    volumes:
+        - nextcloud_core:/var/www/html:ro
+        - nextcloud_data:/var/www/html/data:ro
+        - ./nextcloud_custom:/var/www/html/custom_apps:ro
+        - ./nextcloud_config:/var/www/html/config
+    entrypoint: /cron.sh
+    depends_on:
+      - "app"
+
+  clamav:
+    image: dinkel/clamavd
+    restart: always
+    networks:
+        - net_clamav

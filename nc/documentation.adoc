@@ -1,0 +1,75 @@
+:Author:    Christian Langer
+:Email:     iced-tux
+:Date:      20181201
+:Revision:  0.1
+:page-layout: docs
+:sectnums:
+:source-highlighter: pygments
+:pygments-style: manni
+:pygments-linenums-mode: inline
+
+
+:toc: right
+
+# Dokumentation Docker
+
+## Prerequisites
+
+* https://docs.docker.com/install/linux/docker-ce/centos/#install-docker-ce[Install Docker CE]
+* Installationsbefehle
+[source,linenums]
+----
+yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+yum install docker-ce
+----
+* https://docs.docker.com/engine/swarm/swarm-tutorial/#the-ip-address-of-the-manager-machine[Firewall Config]
+** Manager Node
+[source,sh]
+----
+firewall-cmd --add-port=2377/tcp --permanent
+firewall-cmd --add-port=4789/udp --permanent
+firewall-cmd --permanent --add-rich-rule="rule protocol value=esp accept"
+----
+** Worker Node
+[source, sh]
+----
+firewall-cmd --add-port=4789/udp --permanent
+firewall-cmd --add-port=7946/tcp --add-port=7964/udp --permanent
+firewall-cmd --permanent --add-rich-rule="rule protocol value=esp accept"
+----
+* Docker Engine enable
+[source, sh]
+----
+systemctl enable docker
+----
+* Docker Engine starten
+[source, sh]
+----
+systemctl start docker
+----
+* Init Docker Swarm
+[source, sh]
+----
+docker swarm init --advertise-addr <IP ManagerNode>
+----
+* Join swarm nodes
+[source, sh]
+----
+docker swarm join --token <Init-Toke>
+----
+
+## CIS Härtungen
+
+Nachfolgend die Härtungsmaßnahmen.
+
+### CIS 1.1 create seperate partion for container
+
+[source, sh]
+----
+grep /var/lib/docker /etc/fstab
+----
+[%interactive]
+* [ ] Ja
+* [ ] Nein
