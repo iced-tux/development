@@ -40,7 +40,7 @@ bootloader --location=mbr --append="noipv6" --iscrypted --password=grub.pbkdf2.s
 # setting up fs layout; size is MB without unit
 
 # setting up /boot
-partition /boot --label=boot --asprimary --fstype=xfs  --fsoptions=defaults,noatime,nodev,nosuid --size=512
+partition /boot --label=boot --asprimary --fstype=ext4  --fsoptions=defaults,noatime,nodev,nosuid --size=512
 
 # setting up PVs; grow to fill rest of sda
 partition pv.01 --grow --ondisk=sda
@@ -52,10 +52,10 @@ volgroup vg01 pv.01
 logvol swap --vgname=vg01 --name=swap --size=512
 
 # setting up /var
-logvol /var --vgname=vg01 --name=var --fstype=xfs --fsoptions=defaults,noatime,noexec,nosuid,nodev --size=2048
+logvol /var --vgname=vg01 --name=var --fstype=ext4 --fsoptions=defaults,noatime,noexec,nosuid,nodev --size=2048
 
 # setting root
-logvol / --vgname=vg01 --name=root --fstype=xfs --fsoptions=defaults,noatime --size=1000 --grow
+logvol / --vgname=vg01 --name=root --fstype=ext4 --fsoptions=defaults,noatime --size=1000 --grow
 
 # setting language specifics
 lang en_US.UTF-8
@@ -75,30 +75,33 @@ selinux --enforcing
 # cat /dev/urandom| tr -dc 'a-zA-Z0-9'| fold -w 16 | head -n1
 # generate password:
 # python -c 'import crypt,getpass; print crypt.crypt(getpass.getpass(), "$6$your_16_car_salt_here")'
-rootpw "cloud"
+rootpw --iscrypted $6$Aza75kMYmKOxKz6x$SOyOUDoEcVpH7JEyHJpQnxZnzNQdRywMouVjM0ovcyGBGZW7ty1SXIdGpj.OQTrVkbdrWYOVTwj5tbvyvDIWt1
 
-# group --name=cloud --gid=10000
-# user --groups=cloud --name=cloud --uid=10000 --gid=10000 --plaintext --password=cloud
-user --name="cloud"--uid=10000 --gid=10000 --iscrypted --password="$6$DUG3CDv5slp6z$JrPPiFcsqrv8ibECVhRwq1CtLvW7R0GbYdYk2taILXlX6lJHmzcucEhOL6.frf5d7mdlxNI8oso4CbTtrqhDR/"
-
+user --iscrypted --name=cloud  --uid 10000 --gid 10000 --password=$6$Aza75kMYmKOxKz6x$SOyOUDoEcVpH7JEyHJpQnxZnzNQdRywMouVjM0ovcyGBGZW7ty1SXIdGpj.OQTrVkbdrWYOVTwj5tbvyvDIWt1
 # setting up ssh
 services --enable="sshd"
 
+# we enable that after cleanupscript
+services --disabled="auditd"
 # setting up firewall
 firewall --enabled --service="sshd"
+
 # rebooting
 reboot
 
 # setting up packages
-%packages --nobase
+%packages --nobase --excludedocs
 @core
 openssh-server
+# exclude these
+-*-firmware
 %end
 
 # setting up tmp
 %post --log=/root/ks-post.log
+
 # setting up tmp
-echo 'tmpfs    /tmp    tmpfs    defaults,noatime,noexec,nosuid,nodev    0    0' >> /etc/fstab
+# echo 'tmpfs    /tmp    tmpfs    defaults,noatime,noexec,nosuid,nodev    0    0' >> /etc/fstab
 
 # adding cloud to sudoers
 echo 'cloud ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers.d/cloud
